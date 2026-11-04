@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Flax </title>
+    <style>
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b0c10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', Courier, monospace; 
+            color: #ffffff;
+        }
+
+        .canvas {
+            width: 700px;
+            height: 950px;
+            background: radial-gradient(circle at center, #161822 0%, #050508 100%);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            padding: 40px;
+        }
+
+        /* Hex Codes */
+        .hex-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            opacity: 0.3;
+            letter-spacing: 2px;
+        }
+
+        .hex-header span {
+            transition: opacity 0.3s ease, color 0.3s ease;
+            cursor: default;
+        }
+
+        /* Hover effect on hex numbers */
+        .hex-header span:hover {
+            opacity: 1;
+            color: #99CCFF;
+        }
+
+        /* Typography*/
+        .title-section {
+            margin-top: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .title-section h1 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 300;
+            font-size: 4.5rem;
+            line-height: 0.9;
+            letter-spacing: -1px;
+            color: #ffffff;
+            cursor: default;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        
+        .title-section h1:hover {
+            transform: translateX(8px);
+        }
+
+        .title-section .indent {
+            padding-left: 40px;
+        }
+
+        .scientific-name {
+            font-style: italic;
+            font-size: 1.1rem;
+            opacity: 0.6;
+            margin-top: 15px;
+            padding-left: 40px;
+        }
+
+        /* Image Container*/
+        .container {
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            width: 90%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 1;
+            
+           
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
+        }
+
+        .center-art {
+            max-width: 90%;
+            max-height: 85%;
+            object-fit: contain;
+            opacity: 0.45; 
+            filter: saturate(0.9) contrast(1.05);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        /* UI */
+        .bounding-box {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            pointer-events: auto;
+            opacity: 0; 
+            cursor: crosshair;
+            animation: techFadeIn 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .bounding-box:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+            transform: scale(1.02);
+        }
+
+        .box-1 {
+            width: 180px;
+            height: 180px;
+            top: 320px;
+            right: 80px;
+            border-color: rgba(153, 204, 255, 0.4);
+            animation-delay: 0.3s;
+        }
+
+        .box-1:hover {
+            border-color: #99CCFF;
+            box-shadow: 0 0 15px rgba(153, 204, 255, 0.2);
+        }
+
+        .box-2 {
+            width: 120px;
+            height: 120px;
+            bottom: 220px;
+            left: 80px;
+            border-color: rgba(102, 153, 51, 0.4);
+            animation-delay: 0.7s;
+        }
+
+        .box-2:hover {
+            border-color: #669933;
+            box-shadow: 0 0 15px rgba(102, 153, 51, 0.2);
+        }
+
+        .box-label {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 0.65rem;
+            background: #050508;
+            padding: 2px 6px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .bounding-box:hover .box-label {
+            opacity: 1;
+            color: #ffffff;
+        }
+
+       
+        .info-text {
+            position: absolute;
+            max-width: 210px;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            opacity: 0; 
+            font-weight: 300;
+            z-index: 5;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            animation: textFadeIn 1.5s ease-out forwards;
+            animation-delay: 1.2s;
+            transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+        }
+
+        
+        .info-text:hover {
+            opacity: 1 !important; 
+            color: #99CCFF;
+            transform: translateY(-2px);
+        }
+
+        .text-top-right {
+            top: 240px;
+            right: 60px;
+            text-align: right;
+        }
+
+        .text-mid-left {
+            top: 500px;
+            left: 60px;
+        }
+
+        .text-bottom-right {
+            bottom: 300px;
+            right: 80px;
+            text-align: right;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            padding-right: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-bottom-right:hover {
+            border-right-color: #99CCFF;
+        }
+
+        /* Footer Layout */
+        .poster-footer {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            font-size: 0.7rem;
+            opacity: 0.25;
+        }
+
+        /* Keyframes */
+        @keyframes techFadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes textFadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.55; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas">
+      
+        <header class="hex-header">
+            <span>#CCCC33</span>
+            <span>#000000</span>
+            <span>#99CCFF</span>
+            <span>#669933</span>
+            <span>#FFFFFF</span>
+            <span>#6699FF</span>
+        </header>
+
+        <main class="title-section">
+            <h1>Blue <br><span class="indent">Flax</span></h1>
+            <p class="scientific-name">(Linum perenne / Linum lewisii)</p>
+        </main>
+
+        <div class="container">
+           
+            <img src="https://i.pinimg.com/736x/6f/d7/04/6fd704936a8744e7a803d43c0e963eba.jpg" alt="Blue Flax Layout Asset" class="center-art">
+        </div>
+
+
+        <div class="bounding-box box-1">
+            <span class="box-label">#99CCFF</span>
+        </div>
+        
+        <div class="bounding-box box-2">
+            <span class="box-label">#669933</span>
+        </div>
+
+        <div class="info-text text-top-right">
+            a soft, delicate wildflower bathed in light gradients of blue.
+        </div>
+
+        <div class="info-text text-mid-left">
+            the subtle, graceful bloom of petals only last a day, a reminder of the fleeting moments of life. tranquil, albeit ephemeral.
+        </div>
+
+        <div class="info-text text-bottom-right">
+            nothing lasts forever,<br>so do as you must to spend the best of it.
+        </div>
+
+        <footer class="poster-footer">
+            <p>Graphics by L.M / 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
